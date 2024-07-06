@@ -3,6 +3,7 @@ from pathlib import Path
 from llama_index.core import  SimpleDirectoryReader, VectorStoreIndex, StorageContext, get_response_synthesizer, DocumentSummaryIndex, load_indices_from_storage, load_index_from_storage
 from llama_index.llms.ollama import Ollama
 from llama_index.core.node_parser import SentenceSplitter
+from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 import os
 from llama_index.core import Settings
 
@@ -12,7 +13,9 @@ from llama_index.core import Settings
 # # install the working one
 # pip install python-magic-bin
 # pip install llama-index-embeddings-huggingface
-mistral = Ollama(temperature=0, model="mistral", request_timeout=999999.0)
+mistral = Ollama(temperature=0, model="llama3", request_timeout=999999.0)
+embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5")
+
 
 #generateIndex generates an indiviual index and a summary index for the video as well as adds the video to a global index.
 def generateIndex(videoName):
@@ -22,8 +25,9 @@ def generateIndex(videoName):
     )
     doc[0].metadata = {"video name": videoName.split(";;;")[0], "video Id":videoName.split(";;;")[1][:-4]}
     doc[0].doc_id = videoName.split(";;;")[1][:-4]
+
     Settings.llm = mistral
-    Settings.embed_model = "local"
+    Settings.embed_model = embed_model
     storage_context = StorageContext.from_defaults()
     cur_index = VectorStoreIndex.from_documents(
         doc,
@@ -61,7 +65,7 @@ def generateIndex(videoName):
         "Only the highlight reel section will contain timestamps and the timestamps should strictly follow the format (2% <start timestamp> - <end timestamp> 2%) followed by the highlighted text."
     )
     
-    splitter = SentenceSplitter(chunk_size=1024)
+    splitter = SentenceSplitter(chunk_size=2048)
     response_synthesizer = get_response_synthesizer(
     response_mode="tree_summarize", use_async=True, llm = mistral,
     )
@@ -79,7 +83,7 @@ def generateIndex(videoName):
 #getChatEngine returns the chatEngine with the transcript corresponding to the videoID in its context    
 def getChatEngine(videoId, chatMemory):
     Settings.llm = mistral
-    Settings.embed_model = "local"
+    Settings.embed_model = embed_model
     
     if videoId != "global":
         if not os.path.exists("./llamaindex/"+videoId):
@@ -146,7 +150,7 @@ def getChatEngine(videoId, chatMemory):
 #getSummary returns the pre-generated summary for the video
 def getSummary(videoId):
     Settings.llm = mistral
-    Settings.embed_model = "local"
+    Settings.embed_model = embed_model
     if not os.path.exists("./llamaindex/"+videoId+"_summary"):
         return None
     else:
@@ -157,4 +161,4 @@ def getSummary(videoId):
 
 # To test the module independently
 # if __name__ == "__main__":
-#     generateIndex("russianTale;;;;;;g3f_vi2-8Kk_01.vtt")
+#     generateIndex("House Special Fried Rice  Kenji's Cooking Show;;;ulHfyCKqeuU.vtt")

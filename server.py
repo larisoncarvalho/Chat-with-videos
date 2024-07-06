@@ -47,7 +47,7 @@ def download_subtitles():
 def videoExists(videoId):
     if glob.glob("llamaindex/"+videoId+"_summary"):
         return Response(status=200)
-    elif glob.glob("transcripts/*;;;"+videoId+".vtt") or glob.glob("audio/*"+videoId+".mp3"):
+    elif glob.glob("transcripts/*;;;"+videoId+".vtt") or glob.glob("audio/*"+videoId+".wav"):
         return Response(status=202)
     else:
         return Response(status=404)
@@ -96,9 +96,10 @@ def chat():
         #response = chat_engine.stream_chat(prompt)
         response = chat_engine.chat(prompt)
         chat_engine.reset()
-        pattern = re.compile(r'\(\s*(?:\d+% )?(\d{2}:\d{2}(?:\.\d{3})? - \d{2}:\d{2}(?:\.\d{3})?)\s*(?:\d+% )?(?:\s*\d*%?\s*)?\)?')
+        # pattern = re.compile(r'\(\s*(?:\d+% )?(\d{2}:\d{2}(?:\.\d{3})? - \d{2}:\d{2}(?:\.\d{3})?)\s*(?:\d+% )?(?:\s*\d*%?\s*)?\)?')
+        pattern = re.compile(r'\((.*?(\d{2}:\d{2}:\d{2}(?:\.\d{3})? - \d{2}:\d{2}:\d{2}(?:\.\d{3})?).*?)\)')
         responseText = response.response.replace("\n","<br>")
-        responseText = re.sub(pattern, r'<a>\1</a>', responseText)
+        responseText = re.sub(pattern, r'<a>\2</a>', responseText)
         if "userId" in requestData and requestData['userId'] != None:
             chatStore.persist(persist_path="./llamaindex/chat_store.json")
         data = {
@@ -115,9 +116,10 @@ def summary(videoId):
     summary_response = llmService.getSummary(videoId)
     if summary_response == None:
         return Response(status=404)
-    pattern = re.compile(r'\(\s*(?:\d+% )?(\d{2}:\d{2}(?:\.\d{3})? - \d{2}:\d{2}(?:\.\d{3})?)\s*(?:\d+% )?(?:\s*\d*%?\s*)?\)?')
+    # pattern = re.compile(r'\(\s*(?:\d+% )?(\d{2}:\d{2}(?:\.\d{3})? - \d{2}:\d{2}(?:\.\d{3})?)\s*(?:\d+% )?(?:\s*\d*%?\s*)?\)?')
+    pattern = re.compile(r'\((.*?(\d{2}:\d{2}:\d{2}(?:\.\d{3})? - \d{2}:\d{2}:\d{2}(?:\.\d{3})?).*?)\)')
     responseText = summary_response.replace("\n","<br>")
-    responseText = re.sub(pattern, r'<a>\1</a>', responseText)
+    responseText = re.sub(pattern, r'<a>\2</a>', responseText)
     data = {
     "response": responseText
       }
@@ -172,4 +174,4 @@ def globalChat():
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=80)
+    app.run(host='0.0.0.0', port=2020)

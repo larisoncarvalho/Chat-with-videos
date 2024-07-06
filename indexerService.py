@@ -1,6 +1,6 @@
 import helpers
 from pathvalidate import sanitize_filename
-import transcriptionService
+import transcriptionServiceWhisperCpp
 import llmService
 import youtubeDownloader
 import re
@@ -10,7 +10,9 @@ def processYoutubeVideo(videoUrl, videoName, videoId):
 	sanitizedFileName = re.sub(r'[^\x00-\x7F]+', '', sanitizedFileName)
 	videoName = sanitizedFileName + ";;;"+videoId+".mp3"
 	youtubeDownloader.download_audio(videoUrl, videoName)
-	transcriptionService.translate(videoName= videoName)
+	videoName = videoName[:-4]+".wav"
+	# transcriptionService.translate(videoName= videoName)
+	transcriptionServiceWhisperCpp.translate(videoName= videoName)
 	llmService.generateIndex(videoName=videoName)
 	return
 

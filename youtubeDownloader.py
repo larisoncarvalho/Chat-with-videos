@@ -1,5 +1,6 @@
 import yt_dlp
 import os
+import subprocess
 
 # Download the youtube video and an mp3 file to be transcribed
 def download_audio(link, videoName):
@@ -8,8 +9,11 @@ def download_audio(link, videoName):
 		video_title = info_dict['title']
 		print(video_title)
 		video.download(link)
-		print("video downloaded")
-		return video_title+".mp3"
+		command = ["ffmpeg", "-i", "audio/"+videoName, "-acodec", "pcm_s16le", "-ac", "1", "-ar", "16000", "audio/"+videoName[:-4]+".wav"]
+		subprocess.call(command)
+		command = ["rm", "audio/"+videoName]
+		subprocess.call(command)
+		return video_title+".wav"
 
 # To test the module independently
 # if __name__ == "__main__":
