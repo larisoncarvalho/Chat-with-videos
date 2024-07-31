@@ -16,5 +16,19 @@ LLM and Gen AI powered chat with video files
 - **Adaptability and Integration:** Seamlessly integrate with different LLM models and video platforms, offering a plug-and-play solution tailored to your needs.
 
 
+## Installation
+1. Clone the repository
+2. Install the required packages using pip. 
+`pip install -r requirements.txt`
+3. Make sure Ollama is installed and running. 
+`curl -fsSL https://ollama.com/install.sh | sh`
+4. Make sure Ollama has the model you need.
+`ollama pull llama3`
+5. Run the app. 
+`python server.py`
+6. By default the app will run on port `2020`.
+
+To setup whisper.cpp clone the repository into the current folder and follow the instructions to build the library.
+https://github.com/ggerganov/whisper.cpp
 
 

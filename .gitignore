@@ -1,0 +1,11 @@
+.vscode/settings.json
+bin/*
+lib/*
+share/*
+include/*
+audio/*
+transcripts/*
+llamaindex/*
+pyenv.cfg
+LICENSE
+__pycache__/*

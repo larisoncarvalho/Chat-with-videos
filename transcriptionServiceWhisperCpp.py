@@ -1,5 +1,3 @@
-import whisper
-from whisper.utils import get_writer
 import subprocess
 
 # ./main -m /Users/larisoncarvalho/Documents/whisper.cpp/models/ggml-large-v3-q5_0.bin ../Chat-with-videos/audio/output.wav
